@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import chatCompletion_meta from "../config/metalama";
 import chatCompletion_mistral from "../config/mistral";
 import chatCompletion_perplexy from "../config/perplexy";
@@ -16,7 +16,14 @@ const ContextProvider = (props) => {
   const [showResult, setShowResult] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resultData, setResultData] = useState("");
-  const [chooseAI, setChooseAI] = useState("meta-llama"); // ✅ Default AI selected
+  const [chooseAI, setChooseAI] = useState("meta-llama");
+  const [chatHistory, setChatHistory] = useState([]);
+
+  // Load chat history from localStorage on mount
+  useEffect(() => {
+    const storedHistory = JSON.parse(localStorage.getItem("chatHistory")) || [];
+    setChatHistory(storedHistory);
+  }, []);
 
   const delayPara = (index, nextWord) => {
     setTimeout(() => {
@@ -28,6 +35,8 @@ const ContextProvider = (props) => {
     setLoading(false);
     setShowResult(false);
     setResultData("");
+    setChatHistory([]);
+    localStorage.removeItem("chatHistory"); // Clear stored history
   };
 
   const getAIResponse = async (prompt) => {
@@ -42,12 +51,12 @@ const ContextProvider = (props) => {
         return await chatCompletion_deep(prompt);
       case "qwen":
         return await chatCompletion_qwen(prompt);
-        case "ibm":
-        return await chatCompletion_qwen(prompt);
-        case "ibm_granite":
-        return await chatCompletion_qwen(prompt);
-        case "gemma":
-        return await chatCompletion_qwen(prompt);
+      case "ibm":
+        return await chatCompletion_ibm(prompt);
+      case "ibm_granite":
+        return await chatCompletion_ibm(prompt);
+      case "gemma":
+        return await chatCompletion_ibm(prompt);
       case "gemini":
       default:
         return await chatCompletion_gemini(prompt);
@@ -58,31 +67,39 @@ const ContextProvider = (props) => {
     setResultData("");
     setLoading(true);
     setShowResult(true);
-  
+
     let query = prompt !== undefined ? prompt : input;
     setRecentPrompt(query);
-  
-    // Store in localStorage
-    let history = JSON.parse(localStorage.getItem("searchHistory")) || [];
-    history.unshift(query); // Add new search at the beginning
-    localStorage.setItem("searchHistory", JSON.stringify(history));
-  
+
+    // Store in search history
+    let searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
+    searchHistory.unshift(query);
+    localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+
     let responseText = await getAIResponse(query);
-  
+
     if (!responseText) {
       setResultData("Error: No response received.");
       setLoading(false);
       return;
     }
-  
+
     let responseArray = responseText.split(" ");
     for (let i = 0; i < responseArray.length; i++) {
       delayPara(i, responseArray[i] + " ");
     }
-  
+
+    // Store chat message in history
+    const newChatHistory = [
+      ...chatHistory,
+      { role: "user", content: query },
+      { role: "ai", content: responseText },
+    ];
+    setChatHistory(newChatHistory);
+    localStorage.setItem("chatHistory", JSON.stringify(newChatHistory));
+
     setLoading(false);
   };
-  
 
   const contextValue = {
     input,
@@ -98,6 +115,8 @@ const ContextProvider = (props) => {
     newChat,
     chooseAI,
     setChooseAI,
+    chatHistory,
+    setChatHistory,
   };
 
   return (

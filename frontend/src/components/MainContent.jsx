@@ -3,6 +3,7 @@ import { FaSun, FaMoon } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { IoLogOut } from "react-icons/io5";
 import { IoMdSend } from "react-icons/io";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { Context } from "../context/Context";
 import { ThemeContext } from "../context/ThemeContext";
 import SpeechToText from "./TTS";
@@ -11,10 +12,19 @@ import { useNavigate } from "react-router-dom";
 const MainContent = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useContext(ThemeContext);
-  const { input, setInput, loading, resultData, onSent, chooseAI } =
-    useContext(Context);
+  const {
+    input,
+    setInput,
+    loading,
+    resultData,
+    onSent,
+    chooseAI,
+    chatHistory,
+  } = useContext(Context);
+
   const [searchActive, setSearchActive] = useState(false);
   const [user, setUser] = useState(null);
+  const [showHistory, setShowHistory] = useState(false); // ✅ Controls dropdown visibility
 
   // Load user from localStorage
   useEffect(() => {
@@ -29,7 +39,6 @@ const MainContent = () => {
       onSent();
     }
   };
-
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -47,29 +56,36 @@ const MainContent = () => {
       <div className="w-full px-5 flex justify-between items-center text-xl p-3">
         <button
           onClick={() => navigate("/history")}
-          className=" px-3 py-1 rounded-md hover:bg-blue-600 transition"
+          className="px-3 py-1 rounded-md hover:bg-blue-600 transition"
         >
           History
         </button>
 
         <div className="flex gap-4 items-center">
           {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className={`text-2xl p-2 rounded-full transition ${
+              theme === "dark"
+                ? "bg-gray-700 text-yellow-400"
+                : "bg-gray-300 text-gray-800"
+            }`}
+          >
+            {theme === "dark" ? <FaSun /> : <FaMoon />}
+          </button>
 
           {user ? (
             <>
-              <button onClick={toggleTheme} className="text-2xl ">
-                {theme === "dark" ? (
-                  <FaSun className="text-yellow-400" />
-                ) : (
-                  <FaMoon className="text-gray-800" />
-                )}
-              </button>
               {/* Profile Section */}
               <div
-                className="flex gap-2 items-center cursor-pointer bg-gray-700 p-2 rounded-lg hover:bg-gray-600 transition"
+                className={`flex gap-2 items-center cursor-pointer p-2 rounded-lg transition ${
+                  theme === "dark"
+                    ? "bg-gray-700 hover:bg-gray-600"
+                    : "bg-gray-300 hover:bg-gray-400"
+                }`}
                 onClick={() => navigate("/profile")}
               >
-                <CgProfile className="text-3xl text-gray-300" />
+                <CgProfile className="text-3xl" />
                 <span className="text-sm">{user.name}</span>
               </div>
 
@@ -109,11 +125,21 @@ const MainContent = () => {
       >
         {!searchActive && <p className="text-7xl font-bold mb-5">One-AI</p>}
 
-        <div className="flex items-center w-full bg-gray-200 py-2 px-5 rounded-full mt-5">
+        <div
+          className={`flex items-center w-full py-2 px-5 rounded-full mt-5 transition ${
+            theme === "dark"
+              ? "bg-gray-700 text-white"
+              : "bg-gray-200 text-black"
+          }`}
+        >
           <input
             type="text"
             placeholder="Search here..."
-            className="flex-1 bg-transparent border-none outline-none p-2 text-lg text-black"
+            className={`flex-1 bg-transparent border-none outline-none p-2 text-lg transition ${
+              theme === "dark"
+                ? "text-white placeholder-gray-400"
+                : "text-black"
+            }`}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -122,10 +148,42 @@ const MainContent = () => {
           {input && (
             <IoMdSend
               onClick={handleSearch}
-              className="text-2xl text-black cursor-pointer ml-5"
+              className={`text-2xl cursor-pointer ml-5 transition ${
+                theme === "dark" ? "text-white" : "text-black"
+              }`}
             />
           )}
         </div>
+      </div>
+
+      {/* CHAT HISTORY DROPDOWN */}
+      <div className="w-full max-w-[900px] mt-5">
+        <button
+          onClick={() => setShowHistory(!showHistory)}
+          className="w-full flex justify-between items-center bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition"
+        >
+          Chat History
+          {showHistory ? <FaChevronUp /> : <FaChevronDown />}
+        </button>
+
+        {showHistory && (
+          <div className="mt-2 p-3 bg-gray-600 rounded-md max-h-60 overflow-y-auto">
+            {chatHistory.length > 0 ? (
+              chatHistory.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`p-2 my-2 rounded ${
+                    msg.role === "user" ? "bg-blue-600" : "bg-gray-700"
+                  }`}
+                >
+                  <p>{msg.content}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-300">No chat history available.</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* SEARCH RESULTS */}
@@ -141,7 +199,11 @@ const MainContent = () => {
                   <hr className="rounded-md bg-gray-300 p-4 animate-pulse" />
                 </div>
               ) : (
-                <div className="text-lg font-[400] leading-[1.8]">
+                <div
+                  className={`text-lg font-[400] leading-[1.8] transition ${
+                    theme === "dark" ? "text-white" : "text-black"
+                  }`}
+                >
                   {resultData.split("\n").map((line, index) => (
                     <p key={index} className="mb-3">
                       {line}
