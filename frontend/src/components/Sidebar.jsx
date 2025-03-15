@@ -31,7 +31,7 @@ const Sidebar = () => {
 
   return (
     <div className="w-[22%] bg-[#171717] text-white">
-      <p onClick={() => navigate("/")} className="mt-2 p-2 mr-2.5 text-2xl font-bold cursor-pointer">
+      <p onClick={() => navigate("/")} className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-orange-600 drop-shadow-lg ml-3 mt-2 cursor-pointer">
         One AI
       </p>
       
