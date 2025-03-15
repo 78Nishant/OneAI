@@ -82,7 +82,7 @@ const MainContent = () => {
       <div className="w-full px-5 flex justify-between items-center text-xl p-3">
         <button
           onClick={() => navigate("/history")}
-          className="px-3 py-1 rounded-md hover:bg-blue-600 transition"
+          className="px-3 py-1 rounded-md hover:bg-blue-600 transition font-bold"
         >
           History
         </button>
@@ -138,7 +138,7 @@ const MainContent = () => {
 
       {/* SEARCH BAR */}
       <div className={`transition-all duration-300 w-full max-w-[900px] px-5 ${searchActive ? "mt-5" : "mt-[30vh]"} flex flex-col items-center`}>
-        {!searchActive && <p className="text-7xl font-bold mb-5">One-AI</p>}
+        {!searchActive && <p className="text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-orange-600 drop-shadow-lg ml-3 mt-2 cursor-pointer">One-AI</p>}
 
         <div className={`flex items-center w-full py-2 px-5 rounded-full mt-5 transition ${
             theme === "dark" ? "bg-gray-700 text-white" : "bg-gray-200 text-black"
