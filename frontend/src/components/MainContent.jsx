@@ -4,6 +4,7 @@ import { CgProfile } from "react-icons/cg";
 import { IoLogOut } from "react-icons/io5";
 import { IoMdSend } from "react-icons/io";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { BsFillVolumeUpFill, BsFillVolumeMuteFill } from "react-icons/bs";
 import { Context } from "../context/Context";
 import { ThemeContext } from "../context/ThemeContext";
 import SpeechToText from "./TTS";
@@ -20,19 +21,19 @@ const MainContent = () => {
     onSent,
     chooseAI,
     chatHistory,
+    setChatHistory, // ✅ Added to clear chat history
   } = useContext(Context);
 
   const [searchActive, setSearchActive] = useState(false);
   const [user, setUser] = useState(null);
-  const [showHistory, setShowHistory] = useState(false); // ✅ Controls dropdown visibility
+  const [showHistory, setShowHistory] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
-  // Load user from localStorage
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) setUser(storedUser);
   }, []);
 
-  // Search Handler
   const handleSearch = () => {
     if (input.trim()) {
       setSearchActive(true);
@@ -46,9 +47,34 @@ const MainContent = () => {
     navigate("/");
   };
 
+  // 🔊 TTS Function
+  const handleSpeak = () => {
+    if (!resultData) return;
+    const utterance = new SpeechSynthesisUtterance(resultData);
+    utterance.lang = "en-US";
+    utterance.rate = 1;
+    utterance.pitch = 1;
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+
+    speechSynthesis.speak(utterance);
+  };
+
+  // 🔇 Stop TTS
+  const handleStopSpeaking = () => {
+    speechSynthesis.cancel();
+    setIsSpeaking(false);
+  };
+
+  // 🗑️ Clear Chat History
+  const clearChatHistory = () => {
+    setChatHistory([]);
+    localStorage.removeItem("chatHistory");
+  };
+
   return (
-    <div
-      className={`flex flex-col min-h-screen w-full transition-all duration-300 ${
+    <div className={`flex flex-col min-h-screen w-full transition-all duration-300 ${
         theme === "dark" ? "bg-[#1D1E20] text-white" : "bg-gray-100 text-black"
       } items-center relative`}
     >
@@ -62,13 +88,10 @@ const MainContent = () => {
         </button>
 
         <div className="flex gap-4 items-center">
-          {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
             className={`text-2xl p-2 rounded-full transition ${
-              theme === "dark"
-                ? "bg-gray-700 text-yellow-400"
-                : "bg-gray-300 text-gray-800"
+              theme === "dark" ? "bg-gray-700 text-yellow-400" : "bg-gray-300 text-gray-800"
             }`}
           >
             {theme === "dark" ? <FaSun /> : <FaMoon />}
@@ -76,12 +99,9 @@ const MainContent = () => {
 
           {user ? (
             <>
-              {/* Profile Section */}
               <div
                 className={`flex gap-2 items-center cursor-pointer p-2 rounded-lg transition ${
-                  theme === "dark"
-                    ? "bg-gray-700 hover:bg-gray-600"
-                    : "bg-gray-300 hover:bg-gray-400"
+                  theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-300 hover:bg-gray-400"
                 }`}
                 onClick={() => navigate("/profile")}
               >
@@ -89,7 +109,6 @@ const MainContent = () => {
                 <span className="text-sm">{user.name}</span>
               </div>
 
-              {/* Logout Button */}
               <button
                 onClick={handleLogout}
                 className="bg-red-500 px-3 py-1 rounded-md hover:bg-red-600 transition flex items-center"
@@ -118,28 +137,17 @@ const MainContent = () => {
       </div>
 
       {/* SEARCH BAR */}
-      <div
-        className={`transition-all duration-300 w-full max-w-[900px] px-5 ${
-          searchActive ? "mt-5" : "mt-[30vh]"
-        } flex flex-col items-center`}
-      >
+      <div className={`transition-all duration-300 w-full max-w-[900px] px-5 ${searchActive ? "mt-5" : "mt-[30vh]"} flex flex-col items-center`}>
         {!searchActive && <p className="text-7xl font-bold mb-5">One-AI</p>}
 
-        <div
-          className={`flex items-center w-full py-2 px-5 rounded-full mt-5 transition ${
-            theme === "dark"
-              ? "bg-gray-700 text-white"
-              : "bg-gray-200 text-black"
+        <div className={`flex items-center w-full py-2 px-5 rounded-full mt-5 transition ${
+            theme === "dark" ? "bg-gray-700 text-white" : "bg-gray-200 text-black"
           }`}
         >
           <input
             type="text"
             placeholder="Search here..."
-            className={`flex-1 bg-transparent border-none outline-none p-2 text-lg transition ${
-              theme === "dark"
-                ? "text-white placeholder-gray-400"
-                : "text-black"
-            }`}
+            className="flex-1 bg-transparent border-none outline-none p-2 text-lg"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -148,9 +156,7 @@ const MainContent = () => {
           {input && (
             <IoMdSend
               onClick={handleSearch}
-              className={`text-2xl cursor-pointer ml-5 transition ${
-                theme === "dark" ? "text-white" : "text-black"
-              }`}
+              className="text-2xl cursor-pointer ml-5 transition"
             />
           )}
         </div>
@@ -162,23 +168,25 @@ const MainContent = () => {
           onClick={() => setShowHistory(!showHistory)}
           className="w-full flex justify-between items-center bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition"
         >
-          Chat History
-          {showHistory ? <FaChevronUp /> : <FaChevronDown />}
+          Chat History {showHistory ? <FaChevronUp /> : <FaChevronDown />}
         </button>
 
         {showHistory && (
           <div className="mt-2 p-3 bg-gray-600 rounded-md max-h-60 overflow-y-auto">
             {chatHistory.length > 0 ? (
-              chatHistory.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`p-2 my-2 rounded ${
-                    msg.role === "user" ? "bg-blue-600" : "bg-gray-700"
-                  }`}
+              <>
+                {chatHistory.map((msg, index) => (
+                  <div key={index} className={`p-2 my-2 rounded ${msg.role === "user" ? "bg-blue-600" : "bg-gray-700"}`}>
+                    <p>{msg.content}</p>
+                  </div>
+                ))}
+                <button
+                  onClick={clearChatHistory}
+                  className="w-full mt-3 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
                 >
-                  <p>{msg.content}</p>
-                </div>
-              ))
+                  Clear Chat History
+                </button>
+              </>
             ) : (
               <p className="text-gray-300">No chat history available.</p>
             )}
@@ -192,23 +200,17 @@ const MainContent = () => {
           <div className="py-0 px-[5%] max-h-[70vh] overflow-y-scroll scrollbar">
             <div className="flex items-start gap-5 mt-10">
               {loading ? (
-                <div className="w-full flex flex-col gap-2">
-                  <p>Loading results from {chooseAI}...</p>
-                  <hr className="rounded-md bg-gray-300 p-4 animate-pulse" />
-                  <hr className="rounded-md bg-gray-300 p-4 animate-pulse" />
-                  <hr className="rounded-md bg-gray-300 p-4 animate-pulse" />
-                </div>
+                <p>Loading results from {chooseAI}...</p>
               ) : (
-                <div
-                  className={`text-lg font-[400] leading-[1.8] transition ${
-                    theme === "dark" ? "text-white" : "text-black"
-                  }`}
-                >
+                <div className="text-lg font-[400] leading-[1.8] transition">
                   {resultData.split("\n").map((line, index) => (
-                    <p key={index} className="mb-3">
-                      {line}
-                    </p>
+                    <p key={index} className="mb-3">{line}</p>
                   ))}
+                  {resultData && (
+                    <button onClick={isSpeaking ? handleStopSpeaking : handleSpeak} className="mt-3 px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 flex items-center gap-2">
+                      {isSpeaking ? <BsFillVolumeMuteFill /> : <BsFillVolumeUpFill />} {isSpeaking ? "Stop" : "Listen"}
+                    </button>
+                  )}
                 </div>
               )}
             </div>
