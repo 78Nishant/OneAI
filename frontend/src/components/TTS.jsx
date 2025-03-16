@@ -1,38 +1,32 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { FaMicrophone } from "react-icons/fa";
+import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 
 const SpeechToText = ({ input, setInput }) => {
-  const [listening, setListening] = useState(false);
+  const { transcript, listening, resetTranscript } = useSpeechRecognition();
+//   const {onSent} = useContext(Context);
 
-  const handleSpeechRecognition = () => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      alert("Speech Recognition is not supported in this browser.");
-      return;
+  useEffect(() => {
+    if (!listening && transcript) {
+      setInput(transcript); // Save transcript when listening stops
     }
+  }, [transcript, listening, setInput]);
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-
-    recognition.onstart = () => setListening(true);
-    recognition.onend = () => setListening(false);
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setInput(transcript); // Set the input field with speech text
-    };
-
-    recognition.start();
+  const startListening = () => {
+    resetTranscript();
+    setInput(""); 
+    SpeechRecognition.startListening({ continuous: true, language: "en-US" });
   };
+  
 
   return (
-    <FaMicrophone
-      className={`text-2xl cursor-pointer ${listening ? "text-red-500" : "text-black"}`}
-      onClick={handleSpeechRecognition}
-    />
+    <div className="flex gap-3">
+      <FaMicrophone
+        className={`text-2xl cursor-pointer ${listening ? "text-red-500" : "text-black"}`}
+        onClick={startListening}
+      />
+      {listening && <button className='text-black' onClick={SpeechRecognition.stopListening}>Stop</button>}
+    </div>
   );
 };
 
