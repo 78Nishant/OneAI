@@ -16,7 +16,7 @@ const chatCompletion = await client.chatCompletion({
     max_tokens: 500
 });
 
-console.log("hello")
+
 console.log(chatCompletion.choices[0].message.content)
 
 return chatCompletion.choices[0].message.content;

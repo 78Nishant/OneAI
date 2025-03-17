@@ -6,6 +6,8 @@ import chatCompletion_deep from "../config/deepseek";
 import chatCompletion_qwen from "../config/Qwen";
 import chatCompletion_gemini from "../config/Gemini";
 import chatCompletion_ibm from "../config/IBM";
+import chatCompletion_gemma from "../config/Gemma";
+import chatCompletion_ibm_granite from "../config/IBM_granite";
 
 export const Context = createContext();
 
@@ -54,9 +56,9 @@ const ContextProvider = (props) => {
       case "ibm":
         return await chatCompletion_ibm(prompt);
       case "ibm_granite":
-        return await chatCompletion_ibm(prompt);
+        return await chatCompletion_ibm_granite(prompt);
       case "gemma":
-        return await chatCompletion_ibm(prompt);
+        return await chatCompletion_gemma(prompt);
       case "gemini":
       default:
         return await chatCompletion_gemini(prompt);

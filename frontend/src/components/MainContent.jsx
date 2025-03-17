@@ -10,11 +10,15 @@ import { ThemeContext } from "../context/ThemeContext";
 import SpeechToText from "./TTS";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm"; // Enables strikethroughs, tables, etc.
-import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github-dark.css";
+// import remarkGfm from "remark-gfm"; // Enables strikethroughs, tables, etc.
+// import rehypeHighlight from "rehype-highlight";
+// import "highlight.js/styles/github-dark.css";
+
+import { SignedIn, SignedOut,SignUp, SignInButton, UserButton,useUser, SignOutButton, SignUpButton } from "@clerk/clerk-react";
+
 
 const MainContent = () => {
+  const {isSignedIn, user} = useUser();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useContext(ThemeContext);
   const {
@@ -27,9 +31,9 @@ const MainContent = () => {
     chatHistory,
     setChatHistory, // ✅ Added to clear chat history
   } = useContext(Context);
-
+  console.log("signed IN : ",isSignedIn)
   const [searchActive, setSearchActive] = useState(false);
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [copiedCode, setCopiedCode] = useState(null); // ✅ Track copied code block
@@ -117,33 +121,35 @@ const MainContent = () => {
               <div
                 className={`flex gap-2 items-center cursor-pointer p-2 rounded-lg transition ${theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-300 hover:bg-gray-400"
                   }`}
-                onClick={() => navigate("/profile")}
+                // onClick={() => navigate("/profile")}
               >
-                <CgProfile className="text-3xl" />
-                <span className="text-sm">{user.name}</span>
+                {/* <CgProfile className="text-3xl" /> */}
+                <UserButton />
+                <span className="text-sm">{user?.fullName}</span>
+                
               </div>
 
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 px-3 py-1 rounded-md hover:bg-red-600 transition flex items-center"
-              >
-                <IoLogOut className="text-xl" />
-              </button>
+              <SignOutButton>
+            <button className="bg-red-500 px-3 py-1 rounded-md hover:bg-red-600 transition cursor-pointer">
+              Logout
+            </button>
+          </SignOutButton>
             </>
           ) : (
             <>
               <button
-                onClick={() => navigate("/login")}
+                // onClick={() => navigate("/login")}
                 className="bg-blue-500 px-3 py-1 rounded-md hover:bg-blue-600 transition"
               >
-                Login
+                <SignInButton />
+               
               </button>
 
               <button
-                onClick={() => navigate("/signup")}
+                // onClick={() => navigate("/signup")}
                 className="bg-green-500 px-3 py-1 rounded-md hover:bg-green-600 transition"
               >
-                Sign Up
+                <SignUpButton />
               </button>
             </>
           )}
