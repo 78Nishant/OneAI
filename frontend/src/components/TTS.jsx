@@ -22,7 +22,7 @@ const SpeechToText = ({ input, setInput }) => {
   return (
     <div className="flex gap-3">
       <FaMicrophone
-        className={`text-2xl cursor-pointer ${listening ? "text-red-500" : "text-black"}`}
+        className={`text-2xl cursor-pointer ${listening ? "text-red-500" : "text-white"}`}
         onClick={startListening}
       />
       {listening && <button className='text-black' onClick={SpeechRecognition.stopListening}>Stop</button>}
