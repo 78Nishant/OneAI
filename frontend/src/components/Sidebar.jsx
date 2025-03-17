@@ -91,7 +91,7 @@ const Sidebar = () => {
         ) : (
           <p className="text-gray-400 text-center mt-5">No models found</p>
         )}
-        <button onClick={saveUser} className=" cursor-pointer bg-red-500 text-white font-semiboldtext-center">Save User </button>
+        {/* <button onClick={saveUser} className=" cursor-pointer bg-red-500 text-white font-semiboldtext-center">Save User </button> */}
       </div>
     </div>
   );
