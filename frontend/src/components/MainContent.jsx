@@ -9,6 +9,10 @@ import { Context } from "../context/Context";
 import { ThemeContext } from "../context/ThemeContext";
 import SpeechToText from "./TTS";
 import { useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm"; // Enables strikethroughs, tables, etc.
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github-dark.css";
 
 const MainContent = () => {
   const navigate = useNavigate();
@@ -28,6 +32,7 @@ const MainContent = () => {
   const [user, setUser] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(null); // ✅ Track copied code block
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -73,9 +78,20 @@ const MainContent = () => {
     localStorage.removeItem("chatHistory");
   };
 
+
+  // 📋 Copy code to clipboard
+  const handleCopy = async (text, index) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedCode(index); // Mark the copied code block
+      setTimeout(() => setCopiedCode(null), 1500); // Reset after 1.5 seconds
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
+
   return (
-    <div className={`flex flex-col min-h-screen w-full transition-all duration-300 ${
-        theme === "dark" ? "bg-[#1D1E20] text-white" : "bg-gray-100 text-black"
+    <div className={`flex flex-col min-h-screen w-full transition-all duration-300 ${theme === "dark" ? "bg-[#1D1E20] text-white" : "bg-gray-100 text-black"
       } items-center relative`}
     >
       {/* HEADER */}
@@ -90,9 +106,8 @@ const MainContent = () => {
         <div className="flex gap-4 items-center">
           <button
             onClick={toggleTheme}
-            className={`text-2xl p-2 rounded-full transition ${
-              theme === "dark" ? "bg-gray-700 text-yellow-400" : "bg-gray-300 text-gray-800"
-            }`}
+            className={`text-2xl p-2 rounded-full transition ${theme === "dark" ? "bg-gray-700 text-yellow-400" : "bg-gray-300 text-gray-800"
+              }`}
           >
             {theme === "dark" ? <FaSun /> : <FaMoon />}
           </button>
@@ -100,9 +115,8 @@ const MainContent = () => {
           {user ? (
             <>
               <div
-                className={`flex gap-2 items-center cursor-pointer p-2 rounded-lg transition ${
-                  theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-300 hover:bg-gray-400"
-                }`}
+                className={`flex gap-2 items-center cursor-pointer p-2 rounded-lg transition ${theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-300 hover:bg-gray-400"
+                  }`}
                 onClick={() => navigate("/profile")}
               >
                 <CgProfile className="text-3xl" />
@@ -140,8 +154,7 @@ const MainContent = () => {
       <div className={`transition-all duration-300 w-full max-w-[900px] px-5 ${searchActive ? "mt-5" : "mt-[30vh]"} flex flex-col items-center`}>
         {!searchActive && <p className="text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-orange-600 drop-shadow-lg ml-3 mt-2 cursor-pointer">One-AI</p>}
 
-        <div className={`flex items-center w-full py-2 px-5 rounded-full mt-5 transition ${
-            theme === "dark" ? "bg-gray-700 text-white" : "bg-gray-200 text-black"
+        <div className={`flex items-center w-full py-2 px-5 rounded-full mt-5 transition ${theme === "dark" ? "bg-gray-700 text-white" : "bg-gray-200 text-black"
           }`}
         >
           <input
@@ -203,12 +216,40 @@ const MainContent = () => {
                 <p>Loading results from {chooseAI}...</p>
               ) : (
                 <div className="text-lg font-[400] leading-[1.8] transition">
-                  {resultData.split("\n").map((line, index) => (
-                    <p key={index} className="mb-3">{line}</p>
-                  ))}
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]} // Enables strikethroughs (~text~)
+                    rehypePlugins={[rehypeHighlight]} // Enables syntax highlighting
+                    components={{
+                      code({ inline, className, children, node }) {
+                        const codeText = String(children).trim();
+                        const codeBlockIndex = node?.position?.start?.line || Math.random(); // Unique key for tracking copied state
+
+                        return inline ? (
+                          <code className="bg-gray-800 text-yellow-400 px-1 rounded">{codeText}</code>
+                        ) : (
+                          <pre
+                            className="relative bg-gray-900 p-4 rounded-lg overflow-x-auto cursor-pointer hover:bg-gray-800 transition"
+                            onClick={() => handleCopy(codeText, codeBlockIndex)}
+                          >
+                            <code className={className}>{codeText}</code>
+                            {copiedCode === codeBlockIndex && (
+                              <span className="absolute top-2 right-2 text-sm text-green-400">Copied!</span>
+                            )}
+                          </pre>
+                        );
+                      },
+                    }}
+                  >
+                    {resultData}
+                  </ReactMarkdown>
+
                   {resultData && (
-                    <button onClick={isSpeaking ? handleStopSpeaking : handleSpeak} className="mt-3 px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 flex items-center gap-2">
-                      {isSpeaking ? <BsFillVolumeMuteFill /> : <BsFillVolumeUpFill />} {isSpeaking ? "Stop" : "Listen"}
+                    <button
+                      onClick={isSpeaking ? handleStopSpeaking : handleSpeak}
+                      className="mt-3 px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 flex items-center gap-2"
+                    >
+                      {isSpeaking ? <BsFillVolumeMuteFill /> : <BsFillVolumeUpFill />}
+                      {isSpeaking ? "Stop" : "Listen"}
                     </button>
                   )}
                 </div>
