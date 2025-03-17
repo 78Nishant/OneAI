@@ -1,11 +1,38 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../context/Context";
+import { useUser, useAuth } from "@clerk/clerk-react";
+import axios from "axios";
 
 const Sidebar = () => {
   const [searchQuery, setSearchQuery] = useState(""); // 🔍 Search query state
   const { setChooseAI, chooseAI, onSent } = useContext(Context);
   const navigate = useNavigate();
+
+  const { user, isSignedIn } = useUser();
+  const { getToken } = useAuth();
+
+  const saveUser = async () => {
+    try {
+      
+      const token = await getToken();
+
+      console.log("token is",token)
+
+      if (!token) {
+        alert("No authentication token found. Please sign in.");
+        return;
+      }
+      await axios.post(
+        "http://localhost:3000/main/save-user",
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("User info saved!");
+    } catch (error) {
+      console.error("Error saving user:", error);
+    }
+  };
 
   const aiModels = [
     { name: "Meta-Llama", key: "meta-llama", img_src: "https://asset.kompas.com/crops/lFgJr6bjgPhh0Xs0dli1Z7ybLwg=/109x0:909x533/1200x800/data/photo/2024/07/25/66a1c8562d0ef.png" },
@@ -36,6 +63,7 @@ const Sidebar = () => {
       </p>
       
       {/* Search Input */}
+      
       <div className="w-full flex justify-center">
         <input
           type="text"
@@ -63,6 +91,7 @@ const Sidebar = () => {
         ) : (
           <p className="text-gray-400 text-center mt-5">No models found</p>
         )}
+        <button onClick={saveUser} className=" cursor-pointer bg-red-500 text-white font-semiboldtext-center">Save User </button>
       </div>
     </div>
   );
