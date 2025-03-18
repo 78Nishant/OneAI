@@ -10,9 +10,9 @@ import { ThemeContext } from "../context/ThemeContext";
 import SpeechToText from "./TTS";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-// import remarkGfm from "remark-gfm"; // Enables strikethroughs, tables, etc.
-// import rehypeHighlight from "rehype-highlight";
-// import "highlight.js/styles/github-dark.css";
+import remarkGfm from "remark-gfm"; // Enables strikethroughs, tables, etc.
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github-dark.css";
 
 import { SignedIn, SignedOut,SignUp, SignInButton, UserButton,useUser, SignOutButton, SignUpButton } from "@clerk/clerk-react";
 

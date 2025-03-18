@@ -8,6 +8,7 @@ import chatCompletion_gemini from "../config/Gemini";
 import chatCompletion_ibm from "../config/IBM";
 import chatCompletion_gemma from "../config/Gemma";
 import chatCompletion_ibm_granite from "../config/IBM_granite";
+import chatCompletion_response from "../config/Response";
 
 export const Context = createContext();
 
@@ -59,6 +60,8 @@ const ContextProvider = (props) => {
         return await chatCompletion_ibm_granite(prompt);
       case "gemma":
         return await chatCompletion_gemma(prompt);
+      case "response":
+        return await chatCompletion_response(prompt);
       case "gemini":
       default:
         return await chatCompletion_gemini(prompt);

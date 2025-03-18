@@ -23,6 +23,8 @@
     "react-router-dom": "^7.3.0",
     "react-speech-recognition": "^3.10.0",
     "regenerator-runtime": "^0.14.1",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.0.9"
   },
   "devDependencies": {

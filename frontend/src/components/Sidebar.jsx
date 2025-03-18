@@ -48,7 +48,7 @@ const Sidebar = () => {
 
   // Function to handle AI selection
   const handleSelectAI = async (key) => {
-    setChooseAI(key);
+    setChooseAI(key); //pass ai.key here
     await onSent();
   };
 
@@ -80,7 +80,7 @@ const Sidebar = () => {
           filteredModels.map((ai) => (
             <button
               key={ai.key}
-              onClick={() => handleSelectAI(ai.key)}
+              onClick={() => handleSelectAI(ai.key)} //pass ai here
               className={`font-semibold w-full mt-[10px] inline-flex items-center gap-[10px] py-[10px] px-[15px] text-[16px] cursor-pointer rounded-md transition
               ${chooseAI === ai.key ? "bg-[#3c3b3b] text-white" : "bg-[#171717] hover:bg-gray-400 text-white"}`}
             >

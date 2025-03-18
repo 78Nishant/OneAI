@@ -2,18 +2,17 @@ import { HfInference } from "@huggingface/inference";
 
 const client = new HfInference(import.meta.env.VITE_HUGGING_FACE_API);
 
-
-async function chatCompletion_deep(prompt) {
+async function chatCompletion_response(prompt) {
     try {
 const chatCompletion = await client.chatCompletion({
-    model: "deepseek-ai/DeepSeek-R1",
+    model: prompt.model,
     messages: [
         {
             role: "user",
-            content: prompt
+            content: prompt.query
         }
     ],
-    provider: "nebius",
+    provider: prompt.provider,
     max_tokens: 500,
 });
 
@@ -24,4 +23,4 @@ return chatCompletion.choices[0].message.content;
   }
 }
 
-export default chatCompletion_deep;
+export default chatCompletion_response;
