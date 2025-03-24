@@ -31,7 +31,7 @@ const MainContent = () => {
     chatHistory,
     setChatHistory, // ✅ Added to clear chat history
   } = useContext(Context);
-  console.log("signed IN : ",isSignedIn)
+ 
   const [searchActive, setSearchActive] = useState(false);
   // const [user, setUser] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
@@ -40,7 +40,7 @@ const MainContent = () => {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) setUser(storedUser);
+    // if (storedUser) setUser(storedUser);
   }, []);
 
   const handleSearch = () => {
@@ -108,13 +108,7 @@ const MainContent = () => {
         </button>
 
         <div className="flex gap-4 items-center">
-          <button
-            onClick={toggleTheme}
-            className={`text-2xl p-2 rounded-full transition ${theme === "dark" ? "bg-gray-700 text-yellow-400" : "bg-gray-300 text-gray-800"
-              }`}
-          >
-            {theme === "dark" ? <FaSun /> : <FaMoon />}
-          </button>
+          
 
           {user ? (
             <>
@@ -129,11 +123,11 @@ const MainContent = () => {
                 
               </div>
 
-              <SignOutButton>
+              {/* <SignOutButton>
             <button className="bg-red-500 px-3 py-1 rounded-md hover:bg-red-600 transition cursor-pointer">
               Logout
             </button>
-          </SignOutButton>
+          </SignOutButton> */}
             </>
           ) : (
             <>

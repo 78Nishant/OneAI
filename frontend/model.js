@@ -1,20 +1,130 @@
-//Name of the model and the provider here
+const models = [
+    {
+        key: 'deepseek',
+        name: 'DeepSeek',
+        model_name: 'deepseek-ai/DeepSeek-R1',
+        model_provider: 'nebius',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/6538815d1bdb3c40db94fbfa/xMBly9PUMphrFVMxLX4kq.png',
+    },
+    {
+        key: 'gemini',
+        name: 'Gemini',
+        model_name: 'Google/Gemini-1.5',
+        model_provider: 'google',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/5dd96eb166059660ed1ee413/WtA3YYitedOr9n02eHfJe.png',
+    },
+    {
+        key: 'gemma',
+        name: 'Gemma',
+        model_name: 'google/gemma-2-2b-it',
+        model_provider: 'hf-inference',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/5dd96eb166059660ed1ee413/WtA3YYitedOr9n02eHfJe.png',
+    },
+    {
+        key: 'gemma-2-9b-it',
+        name: 'Gemma-2-9B-It',
+        model_name: 'google/gemma-2-9b-it',
+        model_provider: 'google',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/5dd96eb166059660ed1ee413/WtA3YYitedOr9n02eHfJe.png',
+    },
+    {
+        key: 'gemma-2-27b-it',
+        name: 'Gemma-2-27B-It',
+        model_name: 'google/gemma-2-27b-it',
+        model_provider: 'google',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/5dd96eb166059660ed1ee413/WtA3YYitedOr9n02eHfJe.png',
+    },
+    {
+        key: 'ibm',
+        name: 'IBM',
+        model_name: 'ibm-granite/granite-3.2-2b-instruct',
+        model_provider: 'hf-inference',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/639bcaa2445b133a4e942436/CEW-OjXkRkDNmTxSu8Egh.png',
+    },
+    {
+        key: 'ibm_granite',
+        name: 'IBM_Granite',
+        model_name: 'IBM/Granite-7B',
+        model_provider: 'ibm',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/639bcaa2445b133a4e942436/CEW-OjXkRkDNmTxSu8Egh.png',
+    },
+    {
+        key: 'llama-3.1-8b-instruct',
+        name: 'Llama-3.1-8B-Instruct',
+        model_name: 'meta-llama/Llama-3.1-8B-Instruct',
+        model_provider: 'meta',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/646cf8084eefb026fb8fd8bc/oCTqufkdTkjyGodsx1vo1.png',
+    },
+    {
+        key: 'llama-3.1-70b-instruct',
+        name: 'Llama-3.1-70B-Instruct',
+        model_name: 'meta-llama/Llama-3.1-70B-Instruct',
+        model_provider: 'meta',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/646cf8084eefb026fb8fd8bc/oCTqufkdTkjyGodsx1vo1.png',
+    },
+    {
+        key: 'meta-llama',
+        name: 'Meta-Llama',
+        model_name: 'meta-llama/Llama-3.3-70B-Instruct',
+        model_provider: 'novita',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/646cf8084eefb026fb8fd8bc/oCTqufkdTkjyGodsx1vo1.png',
+    },
+    {
+        key: 'mistral',
+        name: 'Mistral',
+        model_name: 'mistralai/Mistral-7B-Instruct-v0.3',
+        model_provider: 'novita',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/62dac1c7a8ead43d20e3e17a/wrLf5yaGC6ng4XME70w6Z.png',
+    },
+    {
+        key: 'openchat-3.5-0106',
+        name: 'OpenChat-3.5-0106',
+        model_name: 'openchat/OpenChat-3.5-0106',
+        model_provider: 'openchat',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/61b6cbbdbfb266841ec0f24a/bbSODuJyPwH5HKOC6RBVc.png',
+    },
+    {
+        key: 'openhermes-2.5-mistral-7b-gptq',
+        name: 'OpenHermes-2.5-Mistral-7B-GPTQ',
+        model_name: 'openhermes/OpenHermes-2.5-Mistral-7B-GPTQ',
+        model_provider: 'openhermes',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/6317aade83d8d2fd903192d9/erOwgMXc_CZih3uMoyTAp.jpeg',
+    },
+    {
+        key: 'perplexy',
+        name: 'Perplexity',
+        model_name: 'perplexity-ai/r1-1776',
+        model_provider: 'fireworks-ai',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/64b89bf66b5ee8c38859cbd6/l_27fD52uFMZUXdFdY9fR.png',
+    },
+    {
+        key: 'qwen',
+        name: 'Qwen',
+        model_name: 'Qwen/QwQ-32B',
+        model_provider: 'fireworks-ai',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png',
+    },
+    {
+        key: 'qwen2-7b-instruct',
+        name: 'Qwen2-7B-Instruct',
+        model_name: 'qwen/Qwen2-7B-Instruct',
+        model_provider: 'qwen',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png',
+    },
+    {
+        key: 'qwen2-72b-instruct',
+        name: 'Qwen2-72B-Instruct',
+        model_name: 'qwen/Qwen2-72B-Instruct',
+        model_provider: 'qwen',
+        img_src: 'https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png',
+    },
+    {
+        key: 'starling-lm-7b-alpha',
+        name: 'Starling-LM-7B-Alpha',
+        model_name: 'starling/Starling-LM-7B-Alpha',
+        model_provider: 'starling',
+        img_src: 'https://huggingface.co/avatars/f18351bc5ce9c106ba74523d9a55567c.svg',
+    },
+];
 
-const models=[
-    {
-        model_name:"Qwen/QwQ-32B",
-        model_provider:"fireworks-ai",
-    },
-    {
-        model_name:"deepseek-ai/DeepSeek-R1",
-        model_provider:"nebius",
-    },
-    {
-        model_name:"EleutherAI/gpt-neo-2.7B",
-        model_provider:"openai",
-    },
-    {
-        model_name:"EleutherAI/gpt-neo-1.3B",
-        model_provider:"openai",
-    }
-]
+export default models;

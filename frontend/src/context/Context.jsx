@@ -10,6 +10,7 @@ import chatCompletion_gemma from "../config/Gemma";
 import chatCompletion_ibm_granite from "../config/IBM_granite";
 import chatCompletion_response from "../config/Response";
 
+import models from "../../model";
 export const Context = createContext();
 
 const ContextProvider = (props) => {
@@ -34,6 +35,8 @@ const ContextProvider = (props) => {
     }, 75 * index);
   };
 
+  
+
   const newChat = () => {
     setLoading(false);
     setShowResult(false);
@@ -42,38 +45,49 @@ const ContextProvider = (props) => {
     localStorage.removeItem("chatHistory"); // Clear stored history
   };
 
+  // we have chooseAI already
+  // const getAIResponse = async (prompt) => {
+  //   const model=models.find((model)=>model.key===chooseAI);
+    
+  //   switch (chooseAI) {
+  //     case "meta-llama":
+  //       return await chatCompletion_meta(prompt);
+  //     case "mistral":
+  //       return await chatCompletion_mistral(prompt);
+  //     case "perplexy":
+  //       return await chatCompletion_perplexy(prompt);
+  //     case "deepseek":
+  //       return await chatCompletion_deep(prompt);
+  //     case "qwen":
+  //       return await chatCompletion_qwen(prompt);
+  //     case "ibm":
+  //       return await chatCompletion_ibm(prompt);
+  //     case "ibm_granite":
+  //       return await chatCompletion_ibm_granite(prompt);
+  //     case "gemma":
+  //       return await chatCompletion_gemma(prompt);
+  //     case "response":
+  //       return await chatCompletion_response(model,prompt); //prompt :{query,model,provider}
+  //     case "gemini":
+  //     default:
+  //       return await chatCompletion_gemini(prompt);
+  //   }
+  // };
+
+  //testing alternate way
   const getAIResponse = async (prompt) => {
-    switch (chooseAI) {
-      case "meta-llama":
-        return await chatCompletion_meta(prompt);
-      case "mistral":
-        return await chatCompletion_mistral(prompt);
-      case "perplexy":
-        return await chatCompletion_perplexy(prompt);
-      case "deepseek":
-        return await chatCompletion_deep(prompt);
-      case "qwen":
-        return await chatCompletion_qwen(prompt);
-      case "ibm":
-        return await chatCompletion_ibm(prompt);
-      case "ibm_granite":
-        return await chatCompletion_ibm_granite(prompt);
-      case "gemma":
-        return await chatCompletion_gemma(prompt);
-      case "response":
-        return await chatCompletion_response(prompt);
-      case "gemini":
-      default:
-        return await chatCompletion_gemini(prompt);
+    const model=models.find((m)=>m.key===chooseAI);
+    return await chatCompletion_response(model,prompt); //prompt :{query,model,provider}
     }
-  };
+
 
   const onSent = async (prompt) => {
     setResultData("");
     setLoading(true);
     setShowResult(true);
 
-    let query = prompt !== undefined ? prompt : input;
+    let query = prompt !== undefined ? prompt : input; //prompt.query instead of prompt
+    // let query = prompt.query !== undefined ? prompt : input;
     setRecentPrompt(query);
 
     // Store in search history
@@ -81,7 +95,11 @@ const ContextProvider = (props) => {
     searchHistory.unshift(query);
     localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
 
-    let responseText = await getAIResponse(query);
+    let responseText = await getAIResponse(query); //pass prompt here
+
+    //alternate way
+    //let responseText = await chatCompletion_response(prompt);
+
 
     if (!responseText) {
       setResultData("Error: No response received.");

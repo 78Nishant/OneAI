@@ -4,7 +4,7 @@ import MainContent from '../components/MainContent'
 
 const Home = () => {
   return (
-    <div className='flex'>
+    <div className='flex h-screen overflow-y-auto'>
       <Sidebar/>
       <MainContent/>
     </div>
