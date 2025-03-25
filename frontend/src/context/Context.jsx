@@ -1,13 +1,4 @@
 import { createContext, useState, useEffect } from "react";
-import chatCompletion_meta from "../config/metalama";
-import chatCompletion_mistral from "../config/mistral";
-import chatCompletion_perplexy from "../config/perplexy";
-import chatCompletion_deep from "../config/deepseek";
-import chatCompletion_qwen from "../config/Qwen";
-import chatCompletion_gemini from "../config/Gemini";
-import chatCompletion_ibm from "../config/IBM";
-import chatCompletion_gemma from "../config/Gemma";
-import chatCompletion_ibm_granite from "../config/IBM_granite";
 import chatCompletion_response from "../config/Response";
 
 import models from "../../model";
