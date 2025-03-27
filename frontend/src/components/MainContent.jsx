@@ -13,12 +13,14 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm"; // Enables strikethroughs, tables, etc.
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
+import axios from "axios";
 
-import { SignedIn, SignedOut,SignUp, SignInButton, UserButton,useUser, SignOutButton, SignUpButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut,SignUp, SignInButton, UserButton,useUser, SignOutButton, SignUpButton,useAuth } from "@clerk/clerk-react";
 
 
 const MainContent = () => {
   const {isSignedIn, user} = useUser();
+  const { getToken } = useAuth();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useContext(ThemeContext);
   const {
@@ -31,7 +33,37 @@ const MainContent = () => {
     chatHistory,
     setChatHistory, // ✅ Added to clear chat history
   } = useContext(Context);
- 
+  
+
+  
+  // console.log(user.id)
+ //checking if storing in mongodb is working
+ const storeUser = async () => {
+  if (!user) return "none";
+  try {
+    const token = await getToken(); // Get Clerk JWT
+    const userData = {
+      id: user.id,
+      email_address: user.emailAddresses[0].emailAddress,
+      full_name: user.fullName,
+    };
+
+    const response = await axios.post("http://localhost:3000/main/save-user", userData, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    console.log("User stored:", response.data);
+  } catch (error) {
+    console.error("Error saving user in Frontend:", error.response?.data || error.message);
+  }
+};
+  // console.log([user.fullName,user.emailAddresses[0].emailAddress,token])
+  
+
+
   const [searchActive, setSearchActive] = useState(false);
   // const [user, setUser] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
@@ -105,6 +137,12 @@ const MainContent = () => {
           className="px-3 py-1 rounded-md hover:bg-blue-600 transition font-bold"
         >
           History
+        </button>
+
+        <button
+          onClick={storeUser}
+          className="px-3 py-1 rounded-md hover:bg-blue-600 transition border-2 cursor-pointer">
+          Save User
         </button>
 
         <div className="flex gap-4 items-center">

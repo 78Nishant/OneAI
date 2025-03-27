@@ -1,12 +1,13 @@
 const express = require("express");
 const User = require("../model/auth.model.js");
-const authenticateUser = require("../middleware/authMiddleware.js");
+// const authenticateUser = require("../middleware/authMiddleware.js");
+const { ClerkExpressRequireAuth } =require( "@clerk/clerk-sdk-node");
 
 const router = express.Router();
 
-router.post("/save-user", authenticateUser, async (req, res) => {
+router.post("/save-user", ClerkExpressRequireAuth(), async (req, res) => {
   try {
-    const { id, email_addresses, full_name } = req.auth; // Clerk stores data in req.auth
+    const { id, email_address, full_name } = req.body; // Clerk stores data in req.auth
 
     if (!id) {
       return res.status(401).json({ error: "Unauthorized: No user ID found" });
@@ -17,11 +18,11 @@ router.post("/save-user", authenticateUser, async (req, res) => {
     if (!user) {
       user = new User({
         clerkId: id,
-        email: email_addresses?.[0]?.email_address || "", // Avoids undefined error
+        email: email_address, // Avoids undefined error
         fullName: full_name || "Unknown User",
       });
 
-      await user.save();
+      await user.save();  
     }
 
     res.status(200).json({ message: "User saved successfully", user });
@@ -30,7 +31,8 @@ router.post("/save-user", authenticateUser, async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 router.get('/', (req, res) => {
-  res.json('Welcome to the main route');
+  res.json('Welcome to the main route ');
 });
 module.exports = router;
