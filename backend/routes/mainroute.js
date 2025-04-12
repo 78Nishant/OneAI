@@ -31,6 +31,50 @@ router.post("/save-user", ClerkExpressRequireAuth(), async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+router.post("/save-history", ClerkExpressRequireAuth(), async (req, res) => {
+  try {
+    const { id, history } = req.body; // Clerk stores data in req.auth
+
+    if (!id) {
+      return res.status(401).json({ error: "Unauthorized: No user ID found" });
+    }
+
+    let user = await User.findOneAndUpdate(
+      { clerkId: id },
+      { $push: { history: history } },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ message: "History saved successfully", user });
+  } catch (error) {
+    console.error("Error saving history:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.post("/get-history", ClerkExpressRequireAuth(), async (req, res) => {
+  try {
+    const { id } = req.body; // Clerk stores data in req.auth
+
+    if (!id) {
+      return res.status(401).json({ error: "Unauthorized: No user ID found" });
+    }
+
+    let user = await User.findOne({ clerkId: id });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ history: user.history });
+  } catch (error) {
+    console.error("Error fetching history:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 router.get('/', (req, res) => {
   res.json('Welcome to the main route ');

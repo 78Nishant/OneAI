@@ -31,7 +31,7 @@ const MainContent = () => {
     onSent,
     chooseAI,
     chatHistory,
-    setChatHistory, // ✅ Added to clear chat history
+    setChatHistory, 
   } = useContext(Context);
   
 
@@ -61,7 +61,26 @@ const MainContent = () => {
   }
 };
   // console.log([user.fullName,user.emailAddresses[0].emailAddress,token])
-  
+  const saveSearchHistory = async () => {
+    if(!user) return "none";
+    try{
+      const token = await getToken(); // Get Clerk JWT
+      const historyData = {
+        id: user.id,
+        history: input,
+      };
+      const response = await axios.post("http://localhost:3000/main/save-history", historyData, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+      console.log("Search history saved:", response.data);
+    }
+    catch(error){
+      console.error("Error saving search history:", error.response?.data || error.message);
+    }
+  }
 
 
   const [searchActive, setSearchActive] = useState(false);
@@ -77,7 +96,9 @@ const MainContent = () => {
 
   const handleSearch = () => {
     if (input.trim()) {
+
       setSearchActive(true);
+      saveSearchHistory();
       onSent();
     }
   };

@@ -1,12 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import axios from "axios";
+import { useAuth, useUser } from "@clerk/clerk-react";
 
 const History = () => {
   const [history, setHistory] = useState([]);
+  const {user}=useUser()
+  const {getToken}=useAuth
 
   useEffect(() => {
+    const fetchData=async () => {
+    if(!user) {
+      console.log("User not logged in");
+      return; }// Ensure user is logged in before fetching history
+    try{
+      console.log(user.id)
+      const token=await getToken()
+    const userInfo={
+      id:user.id
+    }
+    const res=await axios.get("http://localhost:3000/main/get-history",userInfo,{
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    })
+    console.log(res.data.history)
     const storedHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
     setHistory(storedHistory);
+  }catch(err){
+    console.error("Error fetching history:", err);
+  }}
+  fetchData();
   }, []);
 
   const deleteHistoryItem = (index) => {

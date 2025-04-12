@@ -7,7 +7,7 @@ const connectDB=require('./db/connection');
 const mainroute=require('./routes/mainroute.js');
 const { ClerkExpressRequireAuth, users } =require("@clerk/clerk-sdk-node");
 
-app.use(cors());
+app.use(cors()); 
 app.use(express.json());
 app.use('/main',mainroute);
 
