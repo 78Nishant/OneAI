@@ -24,7 +24,7 @@ const History = () => {
           id: user.id
         };
         
-        const res = await axios.post("http://localhost:3000/main/get-history", userInfo, {
+        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/main/get-history`, userInfo, {
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`,
@@ -46,7 +46,7 @@ const History = () => {
     try {
       if (user) {
         const token = await getToken();
-        await axios.delete(`http://localhost:3000/main/delete-history-item/${id}`, {
+        await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/main/delete-history-item/${id}`, {
           headers: {
             "Authorization": `Bearer ${token}`,
           },
@@ -64,7 +64,7 @@ const History = () => {
     try {
       if (user) {
         const token = await getToken();
-        await axios.delete(`http://localhost:3000/main/clear-history/${user.id}`, {
+        await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/main/clear-history/${user.id}`, {
           headers: {
             "Authorization": `Bearer ${token}`,
           },

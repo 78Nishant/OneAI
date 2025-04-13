@@ -39,6 +39,29 @@ const MainContent = () => {
   const [imageText, setImageText] = useState("");
   const [dropIndicatorVisible, setDropIndicatorVisible] = useState(false);
 
+
+   const storeUser = async () => {
+  if (!user) return "none";
+  try {
+    const token = await getToken(); // Get Clerk JWT
+    const userData = {
+      id: user.id,
+      email_address: user.emailAddresses[0].emailAddress,
+      full_name: user.fullName,
+    };
+
+    const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/main/save-user`, userData, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    console.log("User stored:", response.data);
+  } catch (error) {
+    console.error("Error saving user in Frontend:", error.response?.data || error.message);
+  }
+};
   const saveSearchHistory = async () => {
     if (!user) return "none";
     try {
@@ -47,7 +70,7 @@ const MainContent = () => {
         id: user.id,
         history: input,
       };
-      const response = await axios.post("http://localhost:3000/main/save-history", historyData, {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/main/save-history`, historyData, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
@@ -64,9 +87,7 @@ const MainContent = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [copiedCode, setCopiedCode] = useState(null);
 
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-  }, []);
+ 
 
   // Setup global drag and drop event listeners
   useEffect(() => {
@@ -143,6 +164,10 @@ const MainContent = () => {
       }
     };
   }, []);
+  useEffect(() => {
+    if (isSignedIn) {
+      storeUser();  
+    }},[])
 
   const handleImageFile = async (file) => {
     if (!file || !file.type.startsWith('image/')) {
@@ -330,7 +355,7 @@ const MainContent = () => {
                 One-AI
               </p>
               <p className={`mt-3 text-lg ${isDark ? "text-gray-300" : "text-gray-600"}`}>
-                Your intelligent AI assistant
+                Your ONE AI assistant
               </p>
             </div>
           )}
